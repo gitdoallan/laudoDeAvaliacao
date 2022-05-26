@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import * as EmailValidator from 'email-validator';
 import emailjs from 'emailjs-com';
+import { MIN_NAME_LENGTH, MIN_MESSAGE_LENGTH } from '../helpers/magicNumbers';
 
 export default function ServiceForm() {
   const [nome, setNome] = useState('');
@@ -7,10 +9,24 @@ export default function ServiceForm() {
   const [telefone, setTelefone] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [statusMessage, setStatusMessage] = useState('none');
+  const [btnDisabled, setBtnDisabled] = useState(true);
+
+  useEffect(() => {
+    const isFormValid = EmailValidator.validate(email)
+    && nome.length >= MIN_NAME_LENGTH
+    && mensagem.length >= MIN_MESSAGE_LENGTH;
+    const checkBtnStatus = () => {
+      const cases = {
+        true: () => setBtnDisabled(false),
+        false: () => setBtnDisabled(true),
+      };
+      return cases[isFormValid]();
+    };
+    checkBtnStatus();
+  }, [nome, email, mensagem]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(nome, email, telefone, mensagem);
     setNome(''); setEmail(''); setTelefone(''); setMensagem('');
     const serviceId = 'service_41dfdab';
     const templateId = 'template_qa3x0w5';
@@ -51,7 +67,7 @@ export default function ServiceForm() {
               Mensagem:
               <textarea value={mensagem} id="mensagem" onChange={(e) => setMensagem(e.target.value)} />
             </label>
-            <button type="submit">Enviar</button>
+            <button type="submit" disabled={btnDisabled}>Enviar</button>
             {statusMessage === 'error' && <p>Revise os campos marcados em vermelho.</p>}
           </form>
         )}
