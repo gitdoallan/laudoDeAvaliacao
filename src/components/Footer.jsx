@@ -1,5 +1,9 @@
+import WhatsApp from './WhatsApp';
+
 export default function Footer() {
   return (
-    <div>Footer (+ Botão WhatsApp flutuante)</div>
+    <div>
+      <WhatsApp />
+    </div>
   );
 }
